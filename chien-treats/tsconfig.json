@@ -1,0 +1,67 @@
+{
+    "compilerOptions":  {
+                            "target":  "ES2017",
+                            "lib":  [
+                                        "dom",
+                                        "dom.iterable",
+                                        "esnext"
+                                    ],
+                            "allowJs":  true,
+                            "skipLibCheck":  true,
+                            "strict":  true,
+                            "noEmit":  true,
+                            "esModuleInterop":  true,
+                            "module":  "esnext",
+                            "moduleResolution":  "bundler",
+                            "resolveJsonModule":  true,
+                            "isolatedModules":  true,
+                            "jsx":  "preserve",
+                            "incremental":  true,
+                            "plugins":  [
+                                            {
+                                                "name":  "next"
+                                            }
+                                        ],
+                            "paths":  {
+                                          "@/*":  [
+                                                      "./src/*"
+                                                  ],
+                                          "@data":  [
+                                                        "./packages/data/index.ts"
+                                                    ],
+                                          "@data/*":  [
+                                                          "./packages/data/*"
+                                                      ],
+                                          "@ui/*":  [
+                                                        "./packages/ui/*"
+                                                    ],
+                                          "@config/*":  [
+                                                            "./packages/config/*"
+                                                        ],
+                                          "@emails/*":  [
+                                                            "./packages/emails/*"
+                                                        ],
+                                          "@ui":  [
+                                                      "./packages/ui/index.ts"
+                                                  ],
+                                          "@config":  [
+                                                          "./packages/config/index.ts"
+                                                      ],
+                                          "@emails":  [
+                                                          "./packages/emails/index.ts"
+                                                      ]
+                                      },
+                            "types":  [
+                                          "vitest/globals"
+                                      ]
+                        },
+    "include":  [
+                    "next-env.d.ts",
+                    "**/*.ts",
+                    "**/*.tsx",
+                    ".next/types/**/*.ts"
+                ],
+    "exclude":  [
+                    "node_modules"
+                ]
+}

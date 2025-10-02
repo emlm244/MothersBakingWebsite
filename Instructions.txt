@@ -1,0 +1,625 @@
+Project: Chien’s Treats — Macarons & Baking Website
+Theme: Cozy, comfy, cartoonish + cute
+Primary Visual Reference: Cartoon baker girl (“Chien’s Treats”) description provided below
+Frontend Owner: You (primary front‑end engineer)
+Goal: Deliver a production‑grade, accessible front end for both the customer site and the admin panel with a built‑in ticketing system. Only Stripe payment is a placeholder. All other functionality must be implemented and working on the client using a swappable data layer with IndexedDB persistence.
+
+Project Description (client‑facing summary)
+
+Chien’s Treats is an artisanal bakery site centered on macarons and related baked goods. The project includes:
+
+A public storefront with product browsing, custom orders, cart, checkout (Stripe placeholder), reviews, gallery, and content pages (About/FAQ).
+
+A role‑gated admin panel for managing products, orders, content blocks, coupons, and review moderation—plus a fully functional ticketing system (customer support).
+
+An accessible design system that expresses a cute, cartoon‑inspired brand using approved PFP_Colors.
+
+A swappable data provider with real client‑side persistence (IndexedDB) so the whole app is usable without a backend. Only Stripe is deferred via stubs (demo checkout still works).
+
+Clean docs and repo setup so additional developers can contribute immediately.
+
+This brief is code‑only: do not add screenshots, binary image assets, or other non‑code media. For visuals (hero, product thumbnails, gallery placeholders), generate them programmatically (SVG/data‑URI) from tokens and product metadata.
+
+0) Non‑negotiables & Ground Rules
+
+Only Stripe is a placeholder.
+Everything else (routing, state, forms, validations, ticketing, reviews, moderation, SEO, analytics events, IndexedDB persistence) must be implemented and working.
+
+Code‑only repo:
+Do not commit screenshots or external image files. Provide programmatic visuals (SVG/data‑URI generators) to represent artwork and product images until design assets arrive.
+
+Design tokens: Use PFP_Colors. If a canonical tokens file isn’t available, implement the token values listed in §6 as the approved initial set (they are production‑ready and can be updated later without code changes).
+
+Accessibility: WCAG 2.2 AA (keyboard, ARIA, focus, contrast, reduced‑motion).
+
+Component‑based, typed, documented, test‑covered.
+
+Integration seams: Clear interface boundaries for future backend/API and Stripe.
+
+1) Deliverables & Definition of Done (DoD)
+
+Deliverables
+
+Single Next.js app (recommended) exposing:
+
+Customer site (storefront, reviews, cart, checkout w/ Stripe stub + demo checkout).
+
+Admin panel (/admin) for products, orders, customers, content blocks, coupons, review moderation, and a complete ticketing system.
+
+Data layer abstraction with IndexedDB provider + in‑memory provider for tests. All features use the provider (no direct DB calls in components).
+
+Stripe placeholder only with a fully working demo checkout path that marks orders as paid in demo mode.
+
+Design system & tokens, accessible primitives, and a small icon set.
+
+Docs in repo (README, CONTRIBUTING, Architecture, Integration Contracts).
+
+Acceptance thresholds
+
+Lighthouse on Home, Product, Checkout, Admin Dashboard: Perf ≥90, A11y ≥95, BP ≥95, SEO ≥95.
+
+Axe: No critical violations on key flows.
+
+Tests: Unit coverage ≥80% (statements), Playwright e2e smoke flows pass, a11y checks in CI pass.
+
+Demo checkout creates an order marked demo-paid and shows confirmation.
+
+2) Recommended Tech Stack
+
+Framework: React + Next.js (App Router) + TypeScript
+
+Styling: Tailwind CSS + CSS variables (tokens)
+
+UI primitives: Radix UI
+
+State: Redux Toolkit (RTK) + RTK Query or Zustand
+
+Forms: React Hook Form + Zod
+
+Persistence: IndexedDB (Dexie or idb) via provider interface
+
+Testing: Vitest + React Testing Library; Playwright (e2e); axe‑core (a11y)
+
+Storybook: Component docs (no screenshots required)
+
+CI: GitHub Actions
+
+3) GitHub Setup (public repo)
+
+Files
+
+README.md (no images/screenshots; include description, setup, scripts)
+
+CONTRIBUTING.md (Conventional Commits, branching, review rules)
+
+.gitignore, CODEOWNERS, .editorconfig, .nvmrc or .tool-versions
+
+.github/ISSUE_TEMPLATE/bug.md, feature.md
+
+.github/PULL_REQUEST_TEMPLATE.md (no screenshot section)
+
+.github/workflows/ci.yml (typecheck, lint, test, build, a11y checks)
+
+SECURITY.md, LICENSE (MIT unless otherwise directed)
+
+Branching & protections
+
+Protect main; require passing CI and 1 approval
+
+Enforce Conventional Commits in CI
+
+Labels
+type:feature, type:bug, type:chore, a11y, design-system, admin, ticketing, payments, good first issue
+
+4) App Architecture & Folder Layout
+/app
+  /(site)           # Public routes
+  /(admin)          # Admin routes (role-protected)
+/components         # Presentational components
+/features           # Feature modules (cart, reviews, ticketing, etc.)
+/packages
+  /ui               # Design system components
+  /data             # Models, providers (indexeddb, memory), seeders
+  /config           # Tokens, ESLint/Prettier/TS/Tailwind presets
+  /emails           # React Email templates (rendered in dev tools)
+/lib                # Utilities (analytics, a11y, formatting)
+/styles             # Tailwind + tokens.css
+
+5) Pages & Flows (Public site)
+
+Home: Hero (programmatic graphic—see §15), featured products, USP badges, CTA to Shop/Custom Orders, reviews carousel, newsletter form (client CSV export).
+
+Shop: Product list with filters (flavor, dietary, price, availability), sorting, pagination, quick‑add.
+
+Product Detail: Gallery (programmatic visuals), description, ingredients/allergens, rating & reviews, related items.
+
+Custom Orders: Box configurator (flavors, quantity, event date), price estimator → adds to cart.
+
+Cart: Update qty/remove; coupon code; shipping estimate.
+
+Checkout: Contact/shipping forms → Stripe button (placeholder) + Demo Pay.
+
+Order Confirmation: Order summary + link to open support ticket.
+
+About / Our Story, Gallery (programmatic visuals), Reviews index, FAQ, Contact/Support (creates ticket), Legal.
+
+6) Design System & Tokens (PFP_Colors aligned)
+
+Use as approved initial tokens (replace values later if the canonical PFP_Colors file differs):
+
+/* styles/tokens.css */
+:root {
+  --color-bg:       #F2E6D8; /* beige background */
+  --color-pink:     #F7A8C5; /* brand pink */
+  --color-pink-600: #E4749F;
+  --color-brown:    #6B4A3A; /* hair/shoes/spoon */
+  --color-cream:    #FFF7F3; /* cards/surfaces */
+  --color-white:    #FFFFFF;
+  --color-black:    #121212;
+  --color-red:      #DA2E47; /* cherry */
+  --color-yellow:   #F6C94C; /* candle */
+  --color-silver:   #C0C5CB; /* tray */
+
+  --radius-sm: 8px; --radius-md: 16px; --radius-lg: 24px;
+  --shadow-1: 0 2px 6px rgba(0,0,0,.08);
+  --shadow-2: 0 8px 24px rgba(0,0,0,.10);
+  --space-1: .25rem; --space-2: .5rem; --space-3: .75rem; --space-4: 1rem;
+
+  --font-brand: "Nunito", "Baloo 2", system-ui, sans-serif;
+  --font-body:  "Inter", system-ui, sans-serif;
+}
+
+
+Tailwind config maps CSS vars to theme.
+
+Motion: Framer Motion; respect prefers-reduced-motion.
+
+Cute polish: soft shadows, rounded corners, pill buttons, subtle micro‑interactions.
+
+7) Accessibility (WCAG 2.2 AA)
+
+Skip link; visible focus; logical tab order; Esc closes overlays.
+
+Radix primitives for composite widgets (Tabs/Accordion/Menu/Dialog).
+
+Contrast ≥ 4.5:1; label every input; associate errors via aria-describedby.
+
+Validation messages are announced and keyboard reachable.
+
+8) Data Models (TypeScript)
+export type ID = string;
+export type Role = 'guest' | 'customer' | 'staff' | 'admin' | 'support';
+
+export interface User { id: ID; email: string; name: string; role: Role; createdAt: string; }
+
+export interface Product {
+  id: ID; slug: string; name: string; subtitle?: string;
+  priceCents: number;
+  flavors: string[]; tags: string[]; isAvailable: boolean;
+  images: string[]; // data-URIs generated in code
+  descriptionMd: string;
+  nutrition?: Record<string,string>;
+  allergens?: string[];
+  createdAt: string; updatedAt: string;
+}
+
+export interface Review {
+  id: ID; productId: ID; userName: string;
+  rating: 1|2|3|4|5; title?: string; body: string;
+  status: 'pending'|'approved'|'rejected';
+  rejectionReason?: string;
+  createdAt: string; updatedAt: string;
+}
+
+export interface CartItem { productId: ID; qty: number; }
+
+export interface Order {
+  id: ID; number: string;
+  items: Array<{ productId: ID; name: string; qty: number; priceCents: number; }>;
+  subtotalCents: number; taxCents: number; shippingCents: number; totalCents: number;
+  customer: { name: string; email: string; phone?: string; };
+  shipping?: { method: 'pickup'|'delivery'; address?: string; date?: string; };
+  payment: { status: 'unpaid'|'paid'|'refunded'|'demo-paid'; provider?: 'stripe'; };
+  createdAt: string; updatedAt: string;
+}
+
+export interface Coupon { code: string; pctOff?: number; amountOffCents?: number; active: boolean; }
+
+export interface Ticket {
+  id: ID; number: string; title: string; body: string;
+  status: 'open'|'in_progress'|'waiting'|'closed';
+  priority: 'low'|'medium'|'high'|'urgent';
+  labels: string[]; requesterEmail: string;
+  assigneeId?: ID; watchers?: ID[];
+  internalNotes: Array<{ by: ID; at: string; note: string }>;
+  attachments: Array<{ name: string; mime: string; dataUrl: string }>;
+  createdAt: string; updatedAt: string;
+}
+
+9) Ticketing System
+
+Public intake (/support/new): email, subject, message, optional order #, file attachments → creates Ticket → confirmation page displays ticket number.
+Admin (/admin/tickets): filters, search, pagination, detail view, internal notes, assignment, labels, priority, bulk actions, CSV export/import.
+Notifications: Toasts, optional desktop notifications (permissioned).
+
+10) Data Access Layer (swappable)
+
+Provide a single interface and implementations:
+
+export interface DataProvider {
+  listProducts(...): Promise<Product[]>;
+  getProduct(idOrSlug: string): Promise<Product | null>;
+  upsertProduct(p: Product): Promise<void>;
+  deleteProduct(id: ID): Promise<void>;
+  listReviews(productId: ID, status?: Review['status']): Promise<Review[]>;
+  submitReview(...): Promise<Review>;
+  setReviewStatus(...): Promise<void>;
+  createOrder(...): Promise<Order>;
+  listOrders(): Promise<Order[]>;
+  getOrder(id: ID): Promise<Order | null>;
+  updateOrder(o: Order): Promise<void>;
+  listCoupons(): Promise<Coupon[]>;
+  upsertCoupon(c: Coupon): Promise<void>;
+  createTicket(...): Promise<Ticket>;
+  listTickets(...): Promise<Ticket[]>;
+  getTicket(id: ID): Promise<Ticket | null>;
+  updateTicket(t: Ticket): Promise<void>;
+}
+
+
+IndexedDbProvider (default), InMemoryProvider (tests).
+
+RestProvider skeleton with commented endpoint shapes (no network calls yet).
+
+11) Authentication & Roles
+
+Client‑side demo auth (no backend): guest, customer, staff, support, admin.
+/admin requires admin or staff (tickets visible also to support).
+Dev tools page allows role impersonation for testing.
+
+12) Reviews & Moderation
+
+Public can submit reviews; Admin moderation queue approves/rejects (with reason).
+Only approved reviews render publicly; show rating average + histogram.
+
+13) Stripe Integration (placeholder ONLY)
+
+UI present; real payment disabled without backend.
+
+Stubs in /lib/payments/stripe.ts:
+
+export async function createCheckoutSession(/* orderDraft */) {
+  throw new Error("Stripe not yet configured. See /docs/INTEGRATIONS.md#stripe");
+}
+
+
+Demo checkout controlled by NEXT_PUBLIC_DEMO_CHECKOUT=true: marks order as demo-paid and routes to confirmation.
+
+14) Email & Notifications (no external service)
+
+Use React Email templates (/packages/emails) for Order Confirmation, Ticket Created, Ticket Updated.
+Preview templates in dev tools route (/admin/dev-tools/emails).
+Newsletter signups exportable as CSV.
+
+15) Content & “Visuals without Images”
+
+Do not add image files.
+
+Implement a programmatic art system that generates SVG/data‑URI visuals based on tokens and product/flavor names. Examples:
+
+Hero background: animated pastel shapes (SVG) using --color-pink, --color-cream.
+
+Product/gallery tiles: generateFlavorArt(name, tokens) → returns data:image/svg+xml;utf8,... with rounded rectangles, sprinkles, and the flavor label.
+
+Provide a small utility:
+
+export function generateFlavorArt(label: string, hex: string, w=640, h=480) {
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${h}' viewBox='0 0 ${w} ${h}'>
+    <defs>
+      <radialGradient id='g' cx='50%' cy='40%'><stop offset='0%' stop-color='${hex}' stop-opacity='0.9'/><stop offset='100%' stop-color='${hex}' stop-opacity='0.4'/></radialGradient>
+    </defs>
+    <rect rx='24' ry='24' x='0' y='0' width='100%' height='100%' fill='url(#g)'/>
+    <g font-family='Nunito, sans-serif' font-size='48' font-weight='700' fill='rgba(0,0,0,.6)'>
+      <text x='50%' y='52%' text-anchor='middle'>${label}</text>
+    </g>
+  </svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
+
+Use these data URIs in Product.images.
+When brand art arrives later, it can replace the generated visuals via the CMS (admin Content section) without code changes.
+
+16) SEO, Metadata & Analytics
+
+Per‑page titles, descriptions, canonical tags, Open Graph, and JSON‑LD (LocalBusiness, Product).
+Sitemap & robots.txt at build.
+Analytics: vendor‑agnostic useAnalytics hook with events: view_product, add_to_cart, begin_checkout, purchase_demo, submit_review, create_ticket.
+
+17) Performance & Quality
+
+Budget: Initial HTML ≤ 20KB; critical JS ≤ 170KB gz; LCP ≤ 2.5s (3G Fast); CLS ≤ 0.1.
+
+Next/Image for programmatic data URIs (or <img> if simpler); lazy‑load below the fold; intrinsic sizing.
+
+Fonts: locally hosted; font-display: swap.
+
+Prefetch internal routes on hover.
+
+18) Testing
+
+Unit: Vitest + RTL for utilities, reducers, provider logic, form validation.
+
+e2e: Playwright flows: Shop → PDP → Cart → Checkout (demo) → Confirm; Review submit → Admin approve; Support ticket → Admin assign/close/export/import.
+
+A11y: axe checks on key pages in CI.
+
+Storybook: Docs only (no image captures required).
+
+19) README Structure (no images)
+
+Project description (from §Project Description)
+
+Quick start (env, scripts)
+
+Tech stack & decisions
+
+Design system & tokens (link to PFP_Colors assumption)
+
+Data model overview
+
+Integration points (Stripe stubs, future REST)
+
+Testing & quality gates
+
+Deployment notes
+
+Contributing & code style
+
+License
+
+20) CONTRIBUTING Essentials (no screenshots)
+
+Conventional Commits.
+
+Branch naming: feat/ticketing-filters, fix/cart-qty.
+
+PR template requires: problem, solution, a11y notes, tests, steps to validate (text), no screenshots.
+
+21) UI Component Inventory
+
+Atoms: Button, IconButton, Link, Badge, Chip, Tag, Tooltip, Spinner, Avatar, RatingStars.
+
+Forms: TextField, TextArea, Select, Radio, Checkbox, Toggle, Slider, FileDropzone, FormField.
+
+Molecules: ProductCard, ReviewCard, TicketCard, CartLineItem, Price, QuantityStepper, Pagination, Breadcrumbs, Toast.
+
+Organisms: Navbar, Footer, FilterPanel, ReviewList, CartDrawer, CheckoutForm, TicketDetailPanel, ModerationQueue, DataTable, Modal, ConfirmDialog.
+
+Layouts: SiteLayout, AdminLayout, AuthLayout.
+
+A11y: SkipLink, VisuallyHidden.
+
+22) Routing Map
+/                         Home
+/shop                     PLP
+/shop/[slug]              PDP
+/custom-orders            Configurator
+/cart                     Cart
+/checkout                 Checkout (Stripe placeholder + demo pay)
+/order/[id]               Confirmation
+/reviews                  Reviews index
+/gallery                  Gallery (programmatic visuals)
+/about                    Our Story
+/faq                      FAQ
+/support/new              Create ticket
+/legal/privacy            Privacy
+/legal/terms              Terms
+
+/admin                    Dashboard
+/admin/products           CRUD
+/admin/orders             List/detail
+/admin/reviews            Moderation
+/admin/content            CMS blocks + gallery admin
+/admin/coupons            CRUD
+/admin/tickets            Ticketing
+/admin/dev-tools          Seed, role switch, email previews
+
+23) Styling & Motion Notes
+
+Soft rounded shapes, pastel tokens, micro‑interactions (e.g., confetti on add‑to‑cart that respects prefers-reduced-motion).
+All interactive states (hover, focus, active, disabled) are visible and accessible.
+
+24) Integration Contracts (for future backend)
+
+Document in /docs/INTEGRATIONS.md:
+
+Stripe (placeholder now)
+
+POST /payments/stripe/create-checkout-session → { url }
+
+POST /payments/stripe/webhook → updates order status
+
+Env: STRIPE_PUBLIC_KEY, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET
+
+REST Provider shapes (commented only): /products, /orders, /reviews, /tickets, /coupons with pagination (?page&limit), JWT auth.
+
+25) Environment Variables (.env.example)
+NEXT_PUBLIC_DEMO_CHECKOUT=true
+NEXT_PUBLIC_SITE_NAME="Chien's Treats"
+NEXT_PUBLIC_BASE_URL="http://localhost:3000"
+
+# Stripe (placeholder)
+NEXT_PUBLIC_STRIPE_PUBLIC_KEY=""
+# server-only once backend exists:
+# STRIPE_SECRET_KEY=""
+# STRIPE_WEBHOOK_SECRET=""
+
+26) Sample Data & Seeding
+
+pnpm seed (or /admin/dev-tools/seed) populates products (macaron flavors), a coupon, reviews (pending/approved), and tickets.
+Product images array should use generateFlavorArt() (see §15), not external files.
+
+27) Security & Privacy
+
+No secrets in client.
+Sanitize user input (reviews/tickets).
+CSP headers if deploy allows.
+Zod validation for all forms.
+
+28) DoD Checklists
+
+Public Site
+
+ All routes implemented.
+
+ Cart math correct; coupon applies.
+
+ Checkout page shows Stripe button (placeholder) and Demo Pay works.
+
+ Reviews can be submitted; stored as pending.
+
+ Support form creates ticket.
+
+Admin
+
+ Dashboard KPIs from IndexedDB.
+
+ Products CRUD (slugging, availability, pricing).
+
+ Orders list/detail; can mark refunded (demo).
+
+ Reviews moderation queue operational.
+
+ Content blocks editable and rendered.
+
+ Coupons CRUD with validation.
+
+ Ticketing list/detail, filters, assign/close, CSV export/import.
+
+Quality
+
+ Tokens aligned to PFP_Colors.
+
+ Axe has no critical issues on key pages.
+
+ Playwright e2e green.
+
+ CI green; docs complete.
+
+29) Minimal Code Stubs
+
+Stripe placeholder + demo pay
+
+// /lib/payments/checkout.ts
+import { DataProvider } from '@/packages/data/provider';
+import { Order } from '@/packages/data/models';
+
+export async function startCheckout(
+  orderDraft: Omit<Order,'id'|'number'|'payment'|'createdAt'|'updatedAt'>,
+  opts: { demo?: boolean },
+  data: DataProvider
+) {
+  if (opts.demo) {
+    const order = await data.createOrder(orderDraft, { demoPaid: true });
+    return { ok: true as const, orderId: order.id, redirectTo: `/order/${order.id}` };
+  }
+  throw new Error('Stripe not configured. Enable demo checkout or add backend per /docs/INTEGRATIONS.md');
+}
+
+
+Programmatic visuals
+
+// /lib/visuals.ts
+export function generateFlavorArt(label: string, hex: string, w=480, h=320) {
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${h}' viewBox='0 0 ${w} ${h}'>
+    <defs><linearGradient id='bg' x1='0' y1='0' x2='1' y2='1'>
+      <stop offset='0%' stop-color='${hex}' stop-opacity='.9'/>
+      <stop offset='100%' stop-color='${hex}' stop-opacity='.5'/>
+    </linearGradient></defs>
+    <rect rx='24' ry='24' width='100%' height='100%' fill='url(#bg)'/>
+    <circle cx='20%' cy='30%' r='24' fill='rgba(255,255,255,.6)'/>
+    <circle cx='70%' cy='65%' r='16' fill='rgba(255,255,255,.5)'/>
+    <text x='50%' y='55%' text-anchor='middle' font-family='Nunito, sans-serif' font-size='36' font-weight='700' fill='rgba(0,0,0,.55)'>${label}</text>
+  </svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
+30) Open Questions (answer if available; otherwise proceed with defaults and document in /docs/assumptions.md)
+
+PFP_Colors: Confirm the canonical token values or file path if different from §6.
+
+Product catalog: Initial SKUs/flavors/prices? Dietary tags?
+
+Pickup/Delivery: Pickup location & hours; delivery radius & flat fee (for demo).
+
+Tax: Simulated tax rate?
+
+Coupons: Initial codes (e.g., WELCOME10)?
+
+Content: About/FAQ copy ready, or use tasteful text placeholders?
+
+Domains: Dev vs. prod base URLs for metadata/canonicals.
+
+Analytics: GA4 later, or privacy‑light alternative?
+
+Admin roles: Initial admin/support accounts for seed?
+
+31) Getting Started (put in README)
+pnpm i
+pnpm dev             # Next.js
+pnpm storybook
+pnpm typecheck
+pnpm lint && pnpm format
+pnpm test
+pnpm test:e2e        # Playwright
+pnpm seed            # Seed demo content (IndexedDB)
+pnpm build && pnpm start
+
+32) .gitignore
+node_modules/
+.next/
+out/
+dist/
+.cache/
+coverage/
+storybook-static/
+.DS_Store
+Thumbs.db
+.env*
+!.env.example
+
+33) JSON‑LD Example (Product)
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "Macaron Variety Box (12)",
+  "image": ["data:image/svg+xml;utf8,PHN2Zy..."], 
+  "description": "Delicate French macarons in cozy, cute flavors.",
+  "brand": "Chien's Treats",
+  "offers": {
+    "@type": "Offer",
+    "priceCurrency": "USD",
+    "price": "24.00",
+    "availability": "https://schema.org/InStock"
+  },
+  "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.8", "reviewCount": "127" }
+}
+</script>
+
+34) Brand Illustration (reference for styling only; no image files)
+
+Use this description to guide theme, spacing, and iconography (do not add image assets now):
+
+Character: Young girl baker; long dark‑brown hair; big black eyes; pink blush; white chef hat; white dress; pink apron with bow; white knee‑high socks; brown shoes.
+
+Props: Left hand—silver tray with a cupcake (white frosting, red cherry, lit yellow candle). Right hand—wooden spoon.
+
+Typography above head: “Chien’s Treats” in curved, playful pink.
+
+Background: Beige.
+
+Palette mapping: Beige → --color-bg; Pink → --color-pink; White → --color-white; Brown → --color-brown; Red → --color-red; Yellow → --color-yellow; Black → --color-black; Silver → --color-silver.
+
+

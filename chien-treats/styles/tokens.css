@@ -1,0 +1,29 @@
+:root {
+  --color-bg:       #F2E6D8;
+  --color-pink:     #F7A8C5;
+  --color-pink-600: #E4749F;
+  --color-brown:    #6B4A3A;
+  --color-cream:    #FFF7F3;
+  --color-white:    #FFFFFF;
+  --color-black:    #121212;
+  --color-red:      #DA2E47;
+  --color-yellow:   #F6C94C;
+  --color-silver:   #C0C5CB;
+
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+
+  --shadow-1: 0 2px 6px rgba(0, 0, 0, 0.08);
+  --shadow-2: 0 8px 24px rgba(0, 0, 0, 0.1);
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+
+  --font-brand: "Nunito", "Baloo 2", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+}
