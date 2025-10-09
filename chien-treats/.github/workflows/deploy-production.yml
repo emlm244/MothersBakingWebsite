@@ -1,0 +1,94 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.github/workflows/ci.yml'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: cd chien-treats && pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: cd chien-treats && pnpm lint
+
+      - name: Typecheck
+        run: cd chien-treats && pnpm typecheck
+
+      - name: API Lint
+        run: cd chien-treats && pnpm api:lint
+
+      - name: API Typecheck
+        run: cd chien-treats && pnpm api:typecheck
+
+      - name: API Tests
+        run: cd chien-treats && pnpm api:test
+
+      - name: Unit tests
+        run: cd chien-treats && pnpm test
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_SSH_PORT || 22 }}
+          script: |
+            cd /srv/sites/chienstreats
+            sudo -u deploy bash /srv/sites/chienstreats/deployment/deploy.sh chienstreats
+
+      - name: Deployment notification
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Deployment successful"
+          else
+            echo "❌ Deployment failed"
+          fi
+
+  rollback:
+    runs-on: ubuntu-latest
+    if: failure() && github.event_name != 'workflow_dispatch'
+    needs: deploy
+
+    steps:
+      - name: Rollback deployment
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_SSH_PORT || 22 }}
+          script: |
+            sudo -u deploy bash /srv/sites/chienstreats/deployment/deploy.sh chienstreats rollback
+
+      - name: Rollback notification
+        run: echo "⚠️ Deployment rolled back to previous release"

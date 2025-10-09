@@ -2,12 +2,18 @@
 
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import type { DataProvider } from "@data";
-import { createInMemoryProvider } from "@data/memory-provider";
+import { createRestProvider } from "@data/rest-provider";
 
 const DataProviderContext = createContext<DataProvider | null>(null);
 
-// Use in-memory provider for development (no backend required)
-const dataProvider = createInMemoryProvider();
+// Use REST provider for production (connects to NestJS API)
+// API base URL is set via NEXT_PUBLIC_API_BASE_URL environment variable
+// In production with Nginx reverse proxy, this will be same-origin: /api/v1
+const apiBaseUrl = typeof window !== "undefined"
+  ? (process.env.NEXT_PUBLIC_API_BASE_URL || "/api/v1")
+  : (process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:4000/api/v1");
+
+const dataProvider = createRestProvider(apiBaseUrl);
 
 export function DataProviderProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
