@@ -1,50 +1,31 @@
 [Unit]
-Description=Chien's Treats API (NestJS/Fastify)
-Documentation=https://github.com/emlm244/MothersBakingWebsite
+Description=Chien's Treats API (NestJS)
 After=network.target postgresql.service redis-server.service
 Wants=postgresql.service redis-server.service
 
 [Service]
 Type=simple
-User=deploy
-Group=www-data
-WorkingDirectory=/srv/sites/chienstreats/current
-EnvironmentFile=/srv/sites/chienstreats/shared/.env.api
-
-# Start command
-ExecStart=/usr/bin/pnpm api:start
-
-# Health check (optional, requires systemd 236+)
-# ExecStartPost=/bin/sh -c 'sleep 5 && curl -f http://localhost:3102/healthz || exit 1'
-
-# Restart policy
-Restart=on-failure
+User=chienstreats
+Group=chienstreats
+WorkingDirectory=/srv/sites/chienstreats/current/apps/api
+Environment=NODE_ENV=production
+EnvironmentFile=/srv/sites/chienstreats/shared/.env
+ExecStart=/usr/bin/node dist/main.js
+Restart=always
 RestartSec=10s
-StartLimitBurst=5
-StartLimitInterval=200s
-
-# Process management
-KillMode=mixed
-KillSignal=SIGTERM
-TimeoutStopSec=30s
-
-# Logging
-StandardOutput=journal
-StandardError=journal
-SyslogIdentifier=chienstreats-api
+StandardOutput=append:/srv/sites/chienstreats/shared/logs/api.log
+StandardError=append:/srv/sites/chienstreats/shared/logs/api-error.log
 
 # Security hardening
 NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
-ReadWritePaths=/srv/sites/chienstreats/shared/logs
-ReadWritePaths=/srv/sites/chienstreats/shared/uploads
-ReadWritePaths=/srv/sites/chienstreats/shared/.prisma
-
-# Resource limits
-LimitNOFILE=65536
-MemoryMax=1.5G
+ReadWritePaths=/srv/sites/chienstreats/shared/logs /srv/sites/chienstreats/shared/uploads
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictRealtime=true
+RestrictNamespaces=true
 
 [Install]
 WantedBy=multi-user.target
