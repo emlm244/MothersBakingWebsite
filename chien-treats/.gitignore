@@ -28,9 +28,17 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+dev.log
+*.log
 
-# env files (can opt-in for committing if needed)
-.env*
+# env files (NEVER commit secrets)
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+apps/api/.env
+apps/api/.env.local
 
 # vercel
 .vercel
@@ -38,3 +46,34 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# api build artifacts
+/apps/api/dist
+/apps/api/tmp
+/apps/api/node_modules
+/uploads
+/tmp
+
+# package build artifacts (TypeScript compiled output)
+/packages/*/dist
+/packages/*/*.js
+/packages/*/*.d.ts
+/packages/*/*.js.map
+!packages/*/src/**/*.js
+!packages/*/scripts/**/*.js
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Deployment
+/deployment-keys
+*.pem
+*.key

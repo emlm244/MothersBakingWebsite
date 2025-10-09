@@ -2,73 +2,38 @@
 
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import type { DataProvider } from "@data";
-import { createIndexedDbProvider, createInMemoryProvider } from "@data";
+import { createInMemoryProvider } from "@data/memory-provider";
 
 const DataProviderContext = createContext<DataProvider | null>(null);
 
-async function ensureSeeded(provider: DataProvider) {
-  const products = await provider.listProducts();
-  if (!products.length) {
-    await provider.seed();
-  }
-}
+// Use in-memory provider for development (no backend required)
+const dataProvider = createInMemoryProvider();
 
 export function DataProviderProvider({ children }: { children: ReactNode }) {
-  const [provider, setProvider] = useState<DataProvider>(() => createInMemoryProvider());
   const [ready, setReady] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
-
-    async function prepare(current: DataProvider) {
+    async function prepare() {
       try {
-        await current.ready();
-        await ensureSeeded(current);
+        await dataProvider.ready();
         if (active) {
           setReady(true);
         }
       } catch (err) {
-        console.error("[data-provider] failed to prepare provider", err);
+        console.error("[data-provider] failed to initialize provider", err);
         if (active) {
-          setError("Unable to initialize data provider.");
+          setReady(true);
         }
       }
     }
-
-    prepare(provider);
-    return () => {
-      active = false;
-    };
-  }, [provider]);
-
-  useEffect(() => {
-    let active = true;
-
-    async function upgrade() {
-      try {
-        console.info("[data-provider] attempting indexeddb provider");
-        const indexed = createIndexedDbProvider();
-        await indexed.ready();
-        await ensureSeeded(indexed);
-        if (!active) return;
-        console.info("[data-provider] indexeddb ready");
-        setProvider(indexed);
-        setError(null);
-      } catch (err) {
-        console.warn("[data-provider] IndexedDB provider failed, continuing with in-memory", err);
-        if (!active) return;
-        setError("Using in-memory data because IndexedDB is unavailable.");
-      }
-    }
-
-    upgrade();
+    prepare();
     return () => {
       active = false;
     };
   }, []);
 
-  if (!ready || !provider) {
+  if (!ready) {
     return (
       <div className="flex min-h-[200px] items-center justify-center text-brown/70">
         Loading bakery goodness...
@@ -77,12 +42,7 @@ export function DataProviderProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <DataProviderContext.Provider value={provider}>
-      {error ? (
-        <div role="alert" className="mb-4 rounded-2xl border border-red/30 bg-red/10 p-4 text-sm text-red">
-          {error}
-        </div>
-      ) : null}
+    <DataProviderContext.Provider value={dataProvider}>
       {children}
     </DataProviderContext.Provider>
   );

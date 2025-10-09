@@ -27,6 +27,25 @@ const config: Config = {
         red: "var(--color-red)",
         yellow: "var(--color-yellow)",
         silver: "var(--color-silver)",
+        // Add primary/secondary aliases for consistency
+        primary: {
+          50: "#FAF5F2",
+          100: "#F2E6D8",
+          500: "#8B6250",
+          600: "#6B4A3A",
+          700: "#523829",
+          800: "#3A2719",
+          900: "#251708",
+        },
+        secondary: {
+          DEFAULT: "var(--color-pink)",
+          600: "var(--color-pink-600)",
+        },
+        accent: {
+          50: "#FFF9F5",
+          100: "#FFF7F3",
+          DEFAULT: "var(--color-pink)",
+        },
       },
       borderRadius: {
         sm: "var(--radius-sm)",

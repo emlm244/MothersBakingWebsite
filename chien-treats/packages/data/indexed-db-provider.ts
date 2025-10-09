@@ -10,7 +10,7 @@ import type {
   Ticket,
   ID,
 } from "./models";
-import type { DataProvider, ListTicketsParams } from "./provider";
+import type { DataProvider, ListTicketsParams, CouponValidationResult, TicketCreateInput } from "./provider";
 import { buildSeedData } from "./seed";
 import { createId, nowIso } from "./utils";
 
@@ -53,6 +53,8 @@ function matchesSearch(value: string, search?: string) {
 }
 
 export class IndexedDbProvider implements DataProvider {
+  private ticketAccessCodes = new Map<ID, string>();
+
   async ready(): Promise<void> {
     await ensureReady();
   }
@@ -61,6 +63,7 @@ export class IndexedDbProvider implements DataProvider {
     await db.transaction("rw", db.tables, async () => {
       await Promise.all(db.tables.map((table) => table.clear()));
     });
+    this.ticketAccessCodes.clear();
   }
 
   async listProducts(): Promise<Product[]> {
@@ -152,6 +155,19 @@ export class IndexedDbProvider implements DataProvider {
     return db.coupons.toArray();
   }
 
+  async validateCoupon(code: string): Promise<CouponValidationResult> {
+    await ensureReady();
+    const coupon = await db.coupons.get(code.toUpperCase());
+    if (!coupon || !coupon.active) {
+      return { valid: false };
+    }
+    return {
+      valid: true,
+      pctOff: coupon.pctOff ?? undefined,
+      amountOffCents: coupon.amountOffCents ?? undefined,
+    };
+  }
+
   async upsertCoupon(coupon: Coupon): Promise<void> {
     await ensureReady();
     await db.coupons.put(coupon);
@@ -162,18 +178,30 @@ export class IndexedDbProvider implements DataProvider {
     await db.coupons.delete(code);
   }
 
-  async createTicket(ticketDraft: Omit<Ticket, "id" | "number" | "createdAt" | "updatedAt">): Promise<Ticket> {
+  async createTicket(ticketDraft: TicketCreateInput): Promise<{ ticket: Ticket; accessCode: string }> {
     await ensureReady();
     const now = nowIso();
     const ticket: Ticket = {
-      ...ticketDraft,
       id: createId("ticket"),
       number: `TIC-${Math.floor(Math.random() * 9000 + 1000)}`,
+      title: ticketDraft.title,
+      body: ticketDraft.body,
+      status: ticketDraft.status,
+      priority: ticketDraft.priority,
+      labels: ticketDraft.labels ?? [],
+      requesterEmail: ticketDraft.requesterEmail ?? "guest@example.com",
+      orderId: ticketDraft.orderId,
+      assigneeId: ticketDraft.assigneeId,
+      watchers: ticketDraft.watchers ?? [],
+      internalNotes: ticketDraft.internalNotes ?? [],
+      attachments: ticketDraft.attachments ?? [],
       createdAt: now,
       updatedAt: now,
     };
     await db.tickets.put(ticket);
-    return ticket;
+    const accessCode = createId("ticketAccess");
+    this.ticketAccessCodes.set(ticket.id, accessCode);
+    return { ticket, accessCode };
   }
 
   async updateTicket(ticket: Ticket): Promise<void> {
@@ -207,10 +235,15 @@ export class IndexedDbProvider implements DataProvider {
     return { items, total: sorted.length };
   }
 
-  async getTicket(id: ID): Promise<Ticket | null> {
+  async getTicket(id: ID, options?: { accessCode?: string }): Promise<Ticket | null> {
     await ensureReady();
     const ticket = await db.tickets.get(id);
-    return ticket ?? null;
+    if (!ticket) return null;
+    const storedCode = this.ticketAccessCodes.get(id);
+    if (storedCode && options?.accessCode && storedCode !== options.accessCode) {
+      return null;
+    }
+    return ticket;
   }
 
   async listContentBlocks(): Promise<ContentBlock[]> {
@@ -262,6 +295,7 @@ export class IndexedDbProvider implements DataProvider {
       await db.galleryItems.bulkAdd(data.galleryItems);
       await db.newsletter.bulkAdd(data.newsletter);
     });
+    this.ticketAccessCodes.clear();
   }
 }
 

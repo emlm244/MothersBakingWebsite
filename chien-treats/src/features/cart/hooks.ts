@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import type { Coupon, Product } from "@data";
+import type { Coupon, CouponValidationResult, Product } from "@data";
 import { useDataProvider } from "@/lib/data-provider";
 import { useAnalytics } from "@/lib/analytics";
 import { formatCurrency } from "@/lib/utils";
@@ -62,26 +62,66 @@ export function useCartSummary() {
   const { cart } = useCart();
   const [products, setProducts] = useState<Product[]>([]);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
+  const [couponCheck, setCouponCheck] = useState<{ code: string; result: CouponValidationResult } | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     if (!provider) return;
 
     async function load() {
-      const [productList, couponList] = await Promise.all([
-        provider.listProducts(),
-        provider.listCoupons(),
-      ]);
+      const productList = await provider.listProducts();
       if (cancelled) return;
       setProducts(productList);
-      setCoupons(couponList);
+
+      if (typeof provider.validateCoupon !== "function") {
+        const couponList = await provider.listCoupons();
+        if (!cancelled) {
+          setCoupons(couponList);
+        }
+      } else {
+        setCoupons([]);
+      }
     }
 
     load();
     return () => {
       cancelled = true;
     };
-  }, [provider, cart.items.length]);
+  }, [provider]);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!provider || typeof provider.validateCoupon !== "function") {
+      setCouponCheck(null);
+      return;
+    }
+
+    const code = cart.couponCode?.trim();
+    if (!code) {
+      setCouponCheck(null);
+      return;
+    }
+    const safeCode = code;
+    const normalizedCode = safeCode.toUpperCase();
+
+    async function validate() {
+      try {
+        const result = await provider.validateCoupon!(safeCode);
+        if (!cancelled) {
+          setCouponCheck({ code: normalizedCode, result });
+        }
+      } catch {
+        if (!cancelled) {
+          setCouponCheck({ code: normalizedCode, result: { valid: false } });
+        }
+      }
+    }
+
+    validate();
+    return () => {
+      cancelled = true;
+    };
+  }, [provider, cart.couponCode]);
 
   const lines: CartLineSummary[] = useMemo(() => {
     return cart.items
@@ -100,9 +140,23 @@ export function useCartSummary() {
   const subtotalCents = lines.reduce((acc, line) => acc + line.lineTotalCents, 0);
 
   const appliedCoupon = useMemo(() => {
-    if (!cart.couponCode) return undefined;
-    return coupons.find((coupon) => coupon.code.toUpperCase() === cart.couponCode);
-  }, [cart.couponCode, coupons]);
+    const code = cart.couponCode?.toUpperCase();
+    if (!code) return undefined;
+
+    if (couponCheck && couponCheck.code === code) {
+      if (!couponCheck.result.valid) {
+        return undefined;
+      }
+      return {
+        code,
+        active: true,
+        pctOff: couponCheck.result.pctOff,
+        amountOffCents: couponCheck.result.amountOffCents,
+      } satisfies Coupon;
+    }
+
+    return coupons.find((coupon) => coupon.code.toUpperCase() === code);
+  }, [cart.couponCode, couponCheck, coupons]);
 
   const discountCents = useMemo(() => {
     if (!appliedCoupon) return 0;

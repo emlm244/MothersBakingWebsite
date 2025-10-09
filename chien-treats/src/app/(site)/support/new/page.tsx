@@ -1,15 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Input, Label, TextArea } from "@ui";
 import { useCreateTicket } from "@/features/ticketing/useCreateTicket";
-import { useDataProvider } from "@/lib/data-provider";
+import { VerifiedUserGate } from "@/features/auth/VerifiedUserGate";
+import { useAppSelector } from "@/store/hooks";
 
 const ticketSchema = z.object({
-  email: z.string().email("Enter a valid email"),
   orderNumber: z.string().optional(),
   title: z.string().min(6, "Add a short summary"),
   body: z.string().min(20, "Describe the question or issue"),
@@ -19,15 +20,14 @@ const ticketSchema = z.object({
 type TicketFormValues = z.infer<typeof ticketSchema>;
 
 export default function SupportNewPage() {
-  const provider = useDataProvider();
-  const { submit, submitting, error, ticket } = useCreateTicket();
+  const router = useRouter();
+  const user = useAppSelector((state) => state.auth.user);
+  const { submit, submitting, error, ticket, accessCode } = useCreateTicket();
   const [submitted, setSubmitted] = useState(false);
-  const [lookupError, setLookupError] = useState<string | null>(null);
 
   const form = useForm<TicketFormValues>({
     resolver: zodResolver(ticketSchema),
     defaultValues: {
-      email: "",
       orderNumber: "",
       title: "",
       body: "",
@@ -36,27 +36,15 @@ export default function SupportNewPage() {
   });
 
   const onSubmit = form.handleSubmit(async (values) => {
-    setLookupError(null);
-    let orderId: string | undefined;
-    const orderQuery = values.orderNumber?.trim();
-    if (orderQuery) {
-      const orders = await provider.listOrders();
-      const match = orders.find((order) => order.number.toLowerCase() === orderQuery.toLowerCase());
-      if (!match) {
-        setLookupError("We could not find that order number but we will still create the ticket.");
-      } else {
-        orderId = match.id;
-      }
-    }
+    const orderRef = values.orderNumber?.trim();
 
     const created = await submit({
-      requesterEmail: values.email,
       title: values.title,
       body: values.body,
       priority: values.priority,
       status: "open",
-      orderId,
-      labels: orderId ? ["orders"] : [],
+      orderId: undefined,
+      labels: orderRef ? ["orders", `order:${orderRef}`] : ["support"],
       assigneeId: undefined,
       watchers: [],
       internalNotes: [],
@@ -64,7 +52,11 @@ export default function SupportNewPage() {
     });
     if (created) {
       setSubmitted(true);
-      form.reset({ email: "", orderNumber: "", title: "", body: "", priority: "medium" });
+      form.reset({ orderNumber: "", title: "", body: "", priority: "medium" });
+      // Redirect to the ticket detail page after a brief delay
+      setTimeout(() => {
+        router.push(`/support/tickets/${created.id}`);
+      }, 1500);
     }
   });
 
@@ -74,18 +66,23 @@ export default function SupportNewPage() {
         <h1 className="font-brand text-4xl text-brown">Need a hand?</h1>
         <p className="text-brown/70">Send a note and the support team will reply within one business day.</p>
       </header>
-      <Card>
-        <CardHeader>
-          <CardTitle>Support ticket</CardTitle>
-          <CardDescription>Share as much detail as possible. Attachments coming soon.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={onSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" {...form.register("email")} />
-              {form.formState.errors.email ? <p className="text-sm text-red">{form.formState.errors.email.message}</p> : null}
-            </div>
+      <VerifiedUserGate>
+        <Card>
+          <CardHeader>
+            <CardTitle>Support ticket</CardTitle>
+            <CardDescription>
+              {user ? (
+                <span>
+                  Signed in as <span className="font-medium text-brown">{user.email}</span>. Share as much detail as possible so
+                  we can help quickly.
+                </span>
+              ) : (
+                "Share as much detail as possible."
+              )}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={onSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="orderNumber">Order number (optional)</Label>
               <Input id="orderNumber" {...form.register("orderNumber")} placeholder="ORD-1234" />
@@ -117,13 +114,23 @@ export default function SupportNewPage() {
               {submitting ? "Sending..." : "Submit ticket"}
             </Button>
             {submitted && ticket ? (
-              <p className="text-sm text-green-700">Ticket {ticket.number} received! We will reply shortly.</p>
+              <div className="space-y-1 rounded-2xl bg-green-50 p-4 text-sm text-green-800">
+                <p>
+                  Ticket <strong>{ticket.number}</strong> received! We will reply shortly.
+                </p>
+                {accessCode ? (
+                  <p className="text-xs text-green-900">
+                    Save your access code{" "}
+                    <span className="font-semibold tracking-wide">{accessCode}</span> to view updates any time.
+                  </p>
+                ) : null}
+              </div>
             ) : null}
-            {lookupError ? <p className="text-sm text-brown/60">{lookupError}</p> : null}
             {error ? <p className="text-sm text-red">{error}</p> : null}
           </form>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </VerifiedUserGate>
     </div>
   );
 }

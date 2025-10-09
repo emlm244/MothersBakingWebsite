@@ -7,6 +7,7 @@ export interface User {
   email: string;
   name: string;
   role: Role;
+  emailVerifiedAt?: string | null;
   createdAt: string;
 }
 
@@ -98,6 +99,7 @@ export interface Ticket {
   priority: TicketPriority;
   labels: string[];
   requesterEmail: string;
+  requesterId?: ID;
   orderId?: ID;
   assigneeId?: ID;
   watchers?: ID[];

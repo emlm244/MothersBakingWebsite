@@ -1,0 +1,37 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#F2E6D8"/>
+
+  <!-- Decorative elements -->
+  <circle cx="100" cy="100" r="60" fill="#F7A8C5" opacity="0.3"/>
+  <circle cx="1100" cy="530" r="80" fill="#F7A8C5" opacity="0.3"/>
+  <circle cx="200" cy="500" r="50" fill="#FFF7F3" opacity="0.5"/>
+  <circle cx="1000" cy="100" r="70" fill="#FFF7F3" opacity="0.5"/>
+
+  <!-- Main macaron illustration -->
+  <ellipse cx="600" cy="315" rx="120" ry="70" fill="#F7A8C5"/>
+  <ellipse cx="600" cy="315" rx="120" ry="70" fill="url(#ogGrad1)"/>
+  <rect x="480" y="315" width="240" height="50" fill="#FFF7F3"/>
+  <ellipse cx="600" cy="385" rx="120" ry="70" fill="#F7A8C5"/>
+  <ellipse cx="600" cy="385" rx="120" ry="70" fill="url(#ogGrad2)"/>
+  <ellipse cx="560" cy="295" rx="35" ry="20" fill="white" opacity="0.4"/>
+
+  <!-- Text -->
+  <text x="600" y="500" font-family="'Nunito', sans-serif" font-size="64" font-weight="700" fill="#6B4A3A" text-anchor="middle">
+    Chien's Treats
+  </text>
+  <text x="600" y="550" font-family="'Inter', sans-serif" font-size="28" fill="#6B4A3A" text-anchor="middle" opacity="0.8">
+    Artisan Macarons • Seattle • Capitol Hill
+  </text>
+
+  <defs>
+    <linearGradient id="ogGrad1" x1="600" y1="245" x2="600" y2="385" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#F7A8C5"/>
+      <stop offset="100%" stop-color="#E4749F"/>
+    </linearGradient>
+    <linearGradient id="ogGrad2" x1="600" y1="315" x2="600" y2="455" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#E4749F"/>
+      <stop offset="100%" stop-color="#F7A8C5"/>
+    </linearGradient>
+  </defs>
+</svg>

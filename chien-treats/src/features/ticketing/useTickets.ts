@@ -24,6 +24,7 @@ export function useTickets() {
           status: filters.status,
           search: filters.search,
           labels: filters.labels,
+          requesterEmail: filters.requesterEmail,
           page: filters.page,
           pageSize: 20,
         });
@@ -44,7 +45,7 @@ export function useTickets() {
     return () => {
       cancelled = true;
     };
-  }, [provider, filters.labels, filters.page, filters.search, filters.status]);
+  }, [provider, filters.labels, filters.page, filters.search, filters.status, filters.requesterEmail]);
 
   return { tickets, total, loading, error };
 }

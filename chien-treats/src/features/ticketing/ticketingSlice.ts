@@ -6,6 +6,7 @@ export interface TicketingState {
   search?: string;
   labels: string[];
   priority?: TicketPriority;
+  requesterEmail?: string;
   page: number;
 }
 
@@ -39,6 +40,10 @@ export const ticketingSlice = createSlice({
       state.priority = action.payload;
       state.page = 1;
     },
+    setRequesterEmail(state, action: PayloadAction<string | undefined>) {
+      state.requesterEmail = action.payload;
+      state.page = 1;
+    },
     setPage(state, action: PayloadAction<number>) {
       state.page = Math.max(1, action.payload);
     },
@@ -47,11 +52,12 @@ export const ticketingSlice = createSlice({
       state.labels = [];
       state.search = undefined;
       state.priority = undefined;
+      state.requesterEmail = undefined;
       state.page = 1;
     },
   },
 });
 
-export const { setStatus, toggleLabel, setSearch, setPriority, setPage, clearFilters } = ticketingSlice.actions;
+export const { setStatus, toggleLabel, setSearch, setPriority, setRequesterEmail, setPage, clearFilters } = ticketingSlice.actions;
 
 export default ticketingSlice.reducer;

@@ -4,10 +4,10 @@ Chien's Treats is a cozy, cartoon-inspired bakery experience focused on artisan 
 
 ## Quick start
 
-`ash
+```
 pnpm install
 pnpm dev
-`
+```
 
 Open http://localhost:3000 for the storefront and http://localhost:3000/admin for the admin panel.
 
@@ -69,4 +69,4 @@ See CONTRIBUTING.md for workflow, branching, and Conventional Commits guidance. 
 
 ## License
 
-MIT — see LICENSE.
+MIT â€“ see LICENSE.

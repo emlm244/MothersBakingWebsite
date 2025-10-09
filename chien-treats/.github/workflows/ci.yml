@@ -26,6 +26,12 @@ jobs:
         run: pnpm lint
       - name: Typecheck
         run: pnpm typecheck
+      - name: API Lint
+        run: pnpm api:lint
+      - name: API Typecheck
+        run: pnpm api:typecheck
+      - name: API Tests
+        run: pnpm api:test
       - name: Unit tests
         run: pnpm test
       - name: Install Playwright browsers

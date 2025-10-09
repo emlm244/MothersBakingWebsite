@@ -1,0 +1,46 @@
+<svg width="800" height="800" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="800" height="800" fill="#FFF7F3"/>
+
+  <!-- Decorative circles -->
+  <circle cx="200" cy="200" r="40" fill="#F7A8C5" opacity="0.2"/>
+  <circle cx="600" cy="150" r="30" fill="#F7A8C5" opacity="0.2"/>
+  <circle cx="150" cy="600" r="50" fill="#F7A8C5" opacity="0.2"/>
+  <circle cx="650" cy="650" r="35" fill="#F7A8C5" opacity="0.2"/>
+
+  <!-- Main macaron -->
+  <ellipse cx="400" cy="360" rx="150" ry="90" fill="#F7A8C5"/>
+  <ellipse cx="400" cy="360" rx="150" ry="90" fill="url(#prodGrad1)"/>
+
+  <rect x="250" y="360" width="300" height="60" fill="#FFF7F3"/>
+  <rect x="250" y="360" width="300" height="60" fill="url(#fillGrad)"/>
+
+  <ellipse cx="400" cy="460" rx="150" ry="90" fill="#F7A8C5"/>
+  <ellipse cx="400" cy="460" rx="150" ry="90" fill="url(#prodGrad2)"/>
+
+  <!-- Shine -->
+  <ellipse cx="340" cy="330" rx="45" ry="25" fill="white" opacity="0.5"/>
+
+  <!-- Text -->
+  <text x="400" y="600" font-family="'Nunito', sans-serif" font-size="32" font-weight="600" fill="#6B4A3A" text-anchor="middle">
+    Product Image
+  </text>
+  <text x="400" y="640" font-family="'Inter', sans-serif" font-size="20" fill="#6B4A3A" text-anchor="middle" opacity="0.6">
+    Coming Soon
+  </text>
+
+  <defs>
+    <linearGradient id="prodGrad1" x1="400" y1="270" x2="400" y2="450" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#F7A8C5"/>
+      <stop offset="100%" stop-color="#E4749F"/>
+    </linearGradient>
+    <linearGradient id="prodGrad2" x1="400" y1="370" x2="400" y2="550" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#E4749F"/>
+      <stop offset="100%" stop-color="#F7A8C5"/>
+    </linearGradient>
+    <linearGradient id="fillGrad" x1="400" y1="360" x2="400" y2="420" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFF7F3" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#F2E6D8" stop-opacity="0.8"/>
+    </linearGradient>
+  </defs>
+</svg>

@@ -1,0 +1,62 @@
+{
+    "compilerOptions":  {
+                            "module":  "commonjs",
+                            "declaration":  true,
+                            "removeComments":  true,
+                            "emitDecoratorMetadata":  true,
+                            "experimentalDecorators":  true,
+                            "allowSyntheticDefaultImports":  true,
+                            "target":  "ES2021",
+                            "lib":  [
+                                        "ES2021"
+                                    ],
+                            "sourceMap":  true,
+                            "outDir":  "./dist",
+                            "baseUrl":  "./src",
+                            "rootDirs":  [
+                                              "./src",
+                                              "../../packages/data",
+                                              "../../packages/emails"
+                                          ],
+                            "moduleResolution":  "node",
+                            "esModuleInterop":  true,
+                            "strict":  true,
+                            "skipLibCheck":  true,
+                            "typeRoots":  [
+                                              "../../node_modules/@types"
+                                          ],
+                            "types":  [
+                                              "node"
+                                          ],
+                            "jsx":  "react-jsx",
+                            "paths":  {
+                                          "@api/*":  [
+                                                         "./*"
+                                                     ],
+                                          "@shared/*":  [
+                                                            "./shared/*"
+                                                        ],
+                                          "@data":  [
+                                                        "../../../packages/data/index.ts"
+                                                    ],
+                                          "@data/*":  [
+                                                          "../../../packages/data/*"
+                                                      ],
+                                          "@emails":  [
+                                                          "../../../packages/emails/index.ts"
+                                                      ],
+                                          "@emails/*":  [
+                                                            "../../../packages/emails/*"
+                                                        ]
+                                      }
+                        },
+    "include":  [
+                    "src/**/*",
+                    "prisma/**/*"
+                ],
+    "exclude":  [
+                    "src/**/*.spec.ts",
+                    "src/**/*.test.ts",
+                    "node_modules"
+                ]
+}

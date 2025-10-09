@@ -14,8 +14,12 @@ export default function AdminDevToolsPage() {
 
   async function seed() {
     if (!provider) return;
-    await provider.seed();
-    setMessage("Demo data re-seeded.");
+    try {
+      await provider.seed();
+      setMessage("Demo data re-seeded.");
+    } catch {
+      setMessage("Seeding is unavailable when connected to the REST API.");
+    }
   }
 
   return (

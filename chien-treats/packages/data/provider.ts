@@ -1,11 +1,46 @@
-import type { Coupon, Order, Product, Review, Ticket, ID, ContentBlock, GalleryItem, NewsletterSignup, TicketStatus } from "./models";
+import type {
+  Coupon,
+  Order,
+  Product,
+  Review,
+  Ticket,
+  ID,
+  ContentBlock,
+  GalleryItem,
+  NewsletterSignup,
+  TicketStatus,
+  TicketPriority,
+  TicketNote,
+  TicketAttachment,
+} from "./models";
+
+export interface CouponValidationResult {
+  valid: boolean;
+  pctOff?: number;
+  amountOffCents?: number;
+}
 
 export interface ListTicketsParams {
   status?: TicketStatus;
   search?: string;
   labels?: string[];
+  requesterEmail?: string;
   page?: number;
   pageSize?: number;
+}
+
+export interface TicketCreateInput {
+  title: string;
+  body: string;
+  status: TicketStatus;
+  priority: TicketPriority;
+  requesterEmail?: string;
+  orderId?: ID;
+  labels?: string[];
+  assigneeId?: ID;
+  watchers?: ID[];
+  internalNotes?: TicketNote[];
+  attachments?: TicketAttachment[];
 }
 
 export interface DataProvider {
@@ -27,13 +62,14 @@ export interface DataProvider {
   getOrder(id: ID): Promise<Order | null>;
 
   listCoupons(): Promise<Coupon[]>;
+  validateCoupon?(code: Coupon["code"]): Promise<CouponValidationResult>;
   upsertCoupon(coupon: Coupon): Promise<void>;
   deleteCoupon(code: Coupon["code"]): Promise<void>;
 
-  createTicket(ticket: Omit<Ticket, "id" | "number" | "createdAt" | "updatedAt">): Promise<Ticket>;
+  createTicket(ticket: TicketCreateInput): Promise<{ ticket: Ticket; accessCode: string }>;
   updateTicket(ticket: Ticket): Promise<void>;
   listTickets(params?: ListTicketsParams): Promise<{ items: Ticket[]; total: number }>;
-  getTicket(id: ID): Promise<Ticket | null>;
+  getTicket(id: ID, options?: { accessCode?: string }): Promise<Ticket | null>;
 
   listContentBlocks(): Promise<ContentBlock[]>;
   upsertContentBlock(block: ContentBlock): Promise<void>;

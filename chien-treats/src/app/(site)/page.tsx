@@ -116,20 +116,20 @@ export default function HomePage() {
         <Card>
           <CardHeader>
             <CardTitle>How it works</CardTitle>
-            <CardDescription>Every feature in this demo is powered by IndexedDB.</CardDescription>
+            <CardDescription>Order macarons in three simple steps.</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 md:grid-cols-3">
             <div>
               <h3 className="font-brand text-lg text-brown">Browse</h3>
-              <p className="text-sm text-brown/70">Filter flavors, read reviews, and explore galleries.</p>
+              <p className="text-sm text-brown/70">Explore our seasonal flavors and read customer reviews.</p>
             </div>
             <div>
               <h3 className="font-brand text-lg text-brown">Customize</h3>
-              <p className="text-sm text-brown/70">Build boxes, apply coupons, and demo checkout.</p>
+              <p className="text-sm text-brown/70">Build custom boxes, apply coupons, and schedule pickup.</p>
             </div>
             <div>
               <h3 className="font-brand text-lg text-brown">Support</h3>
-              <p className="text-sm text-brown/70">Open tickets and monitor status in the admin.</p>
+              <p className="text-sm text-brown/70">Questions? Contact our team for events and special orders.</p>
             </div>
           </CardContent>
         </Card>

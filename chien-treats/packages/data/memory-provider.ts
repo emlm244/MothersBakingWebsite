@@ -9,7 +9,7 @@ import type {
   Ticket,
   ID,
 } from "./models";
-import type { DataProvider, ListTicketsParams } from "./provider";
+import type { DataProvider, ListTicketsParams, CouponValidationResult, TicketCreateInput } from "./provider";
 import { buildSeedData } from "./seed";
 import { createId, nowIso } from "./utils";
 
@@ -23,6 +23,7 @@ export class InMemoryProvider implements DataProvider {
   private orders = new Map<ID, Order>();
   private coupons = new Map<string, Coupon>();
   private tickets = new Map<ID, Ticket>();
+  private ticketAccessCodes = new Map<ID, string>();
   private contentBlocks = new Map<ID, ContentBlock>();
   private galleryItems = new Map<ID, GalleryItem>();
   private newsletter = new Map<ID, NewsletterSignup>();
@@ -121,6 +122,18 @@ export class InMemoryProvider implements DataProvider {
     return [...this.coupons.values()];
   }
 
+  async validateCoupon(code: string): Promise<CouponValidationResult> {
+    const coupon = this.coupons.get(code.toUpperCase());
+    if (!coupon || !coupon.active) {
+      return { valid: false };
+    }
+    return {
+      valid: true,
+      pctOff: coupon.pctOff ?? undefined,
+      amountOffCents: coupon.amountOffCents ?? undefined,
+    };
+  }
+
   async upsertCoupon(coupon: Coupon): Promise<void> {
     this.coupons.set(coupon.code, coupon);
   }
@@ -129,17 +142,29 @@ export class InMemoryProvider implements DataProvider {
     this.coupons.delete(code);
   }
 
-  async createTicket(ticketDraft: Omit<Ticket, "id" | "number" | "createdAt" | "updatedAt">): Promise<Ticket> {
+  async createTicket(ticketDraft: TicketCreateInput): Promise<{ ticket: Ticket; accessCode: string }> {
     const now = nowIso();
     const ticket: Ticket = {
-      ...ticketDraft,
       id: createId("ticket"),
       number: `TIC-${Math.floor(Math.random() * 9000 + 1000)}`,
+      title: ticketDraft.title,
+      body: ticketDraft.body,
+      status: ticketDraft.status,
+      priority: ticketDraft.priority,
+      labels: ticketDraft.labels ?? [],
+      requesterEmail: ticketDraft.requesterEmail ?? "guest@example.com",
+      orderId: ticketDraft.orderId,
+      assigneeId: ticketDraft.assigneeId,
+      watchers: ticketDraft.watchers ?? [],
+      internalNotes: ticketDraft.internalNotes ?? [],
+      attachments: ticketDraft.attachments ?? [],
       createdAt: now,
       updatedAt: now,
     };
     this.tickets.set(ticket.id, ticket);
-    return ticket;
+    const accessCode = createId("ticketAccess");
+    this.ticketAccessCodes.set(ticket.id, accessCode);
+    return { ticket, accessCode };
   }
 
   async updateTicket(ticket: Ticket): Promise<void> {
@@ -153,6 +178,9 @@ export class InMemoryProvider implements DataProvider {
     }
     if (params.labels?.length) {
       items = items.filter((ticket) => params.labels!.every((label) => ticket.labels.includes(label)));
+    }
+    if (params.requesterEmail) {
+      items = items.filter((ticket) => ticket.requesterEmail === params.requesterEmail);
     }
     if (params.search) {
       const search = params.search.toLowerCase();
@@ -170,8 +198,14 @@ export class InMemoryProvider implements DataProvider {
     return { items: items.slice(start, start + pageSize), total: items.length };
   }
 
-  async getTicket(id: ID): Promise<Ticket | null> {
-    return this.tickets.get(id) ?? null;
+  async getTicket(id: ID, options?: { accessCode?: string }): Promise<Ticket | null> {
+    const ticket = this.tickets.get(id);
+    if (!ticket) return null;
+    const storedCode = this.ticketAccessCodes.get(id);
+    if (storedCode && options?.accessCode && storedCode !== options.accessCode) {
+      return null;
+    }
+    return ticket;
   }
 
   async listContentBlocks(): Promise<ContentBlock[]> {
@@ -209,6 +243,7 @@ export class InMemoryProvider implements DataProvider {
     this.reviews = toMap(data.reviews);
     this.orders = toMap(data.orders);
     this.tickets = toMap(data.tickets);
+    this.ticketAccessCodes.clear();
     this.contentBlocks = toMap(data.contentBlocks);
     this.galleryItems = toMap(data.galleryItems);
     this.newsletter = toMap(data.newsletter);

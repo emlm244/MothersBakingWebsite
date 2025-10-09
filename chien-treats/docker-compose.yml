@@ -1,0 +1,62 @@
+﻿version: "3.9"
+services:
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: chiens
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      APP_ENV: development
+      APP_PORT: 4000
+      APP_BASE_URL: http://localhost:4000
+      FRONTEND_ORIGIN: http://localhost:3000
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/chiens
+      REDIS_URL: redis://redis:6379/0
+      JWT_SECRET: please-change-me-32-characters-minimum
+      JWT_EXPIRES_IN: 1h
+      REFRESH_EXPIRES_IN: 30d
+      UPLOAD_DIR: ./uploads
+      MAX_UPLOAD_MB: 5
+      RATE_LIMIT_WINDOW_SEC: 300
+      RATE_LIMIT_MAX: 100
+      RATE_LIMIT_AUTH_WINDOW_SEC: 900
+      RATE_LIMIT_AUTH_MAX: 20
+      METRICS_ENABLED: "true"
+      EMAIL_OUTPUT_DIR: ./tmp/emails
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./uploads:/app/uploads
+      - ./tmp/emails:/app/tmp/emails
+    command: ["node", "apps/api/dist/main.js"]
+
+volumes:
+  postgres-data:
+  redis-data:
