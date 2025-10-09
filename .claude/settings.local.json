@@ -44,7 +44,12 @@
       "Bash(claude mcp:*)",
       "Bash(nslookup:*)",
       "Bash(curl:*)",
-      "Bash(ping:*)"
+      "Bash(ping:*)",
+      "Bash(scp:*)",
+      "Bash(ssh root@109.205.180.240 \"cd /root && chmod +x bootstrap.sh && bash bootstrap.sh 2>&1 | tee bootstrap.log\")",
+      "Bash(mkdir:*)",
+      "Bash(ssh-keygen:*)",
+      "Bash(sshpass:*)"
     ],
     "deny": [],
     "ask": []

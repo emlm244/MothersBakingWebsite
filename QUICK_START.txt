@@ -1,0 +1,52 @@
+═══════════════════════════════════════════════════════════
+   CHIEN'S TREATS - DEPLOYMENT QUICK START
+═══════════════════════════════════════════════════════════
+
+VPS CREDENTIALS:
+  Host: 109.205.180.240
+  User: root
+  Pass: rX93hk15wCPOBx2uE
+
+═══════════════════════════════════════════════════════════
+STEP 1: TRANSFER BOOTSTRAP SCRIPT (Run in PowerShell)
+═══════════════════════════════════════════════════════════
+
+scp C:\Users\bc200\MotherWebsite\chien-treats\deployment\bootstrap.sh root@109.205.180.240:/root/
+
+When prompted: rX93hk15wCPOBx2uE
+
+═══════════════════════════════════════════════════════════
+STEP 2: CONNECT TO VPS
+═══════════════════════════════════════════════════════════
+
+ssh root@109.205.180.240
+
+Password: rX93hk15wCPOBx2uE
+
+═══════════════════════════════════════════════════════════
+STEP 3: RUN BOOTSTRAP (On VPS)
+═══════════════════════════════════════════════════════════
+
+cd /root
+chmod +x bootstrap.sh
+bash bootstrap.sh 2>&1 | tee bootstrap.log
+
+Wait 10-15 minutes for completion.
+
+═══════════════════════════════════════════════════════════
+NEXT STEPS:
+═══════════════════════════════════════════════════════════
+
+After bootstrap completes, follow DEPLOY_NOW.md starting at:
+  → Phase 2: Configuration (Step 4)
+
+═══════════════════════════════════════════════════════════
+TROUBLESHOOTING:
+═══════════════════════════════════════════════════════════
+
+• Connection timeout: Check firewall allows port 22
+• Permission denied: Verify password is correct
+• Bootstrap fails: Check bootstrap.log for errors
+
+Full guide: DEPLOY_NOW.md
+Full runbook: chien-treats/RUNBOOK.md
