@@ -94,6 +94,10 @@ build_app() {
 
     cd "${RELEASE_DIR}/chien-treats"
 
+    # Create symlink to shared environment file for NestJS ConfigModule
+    log_info "Linking environment file..."
+    ln -sf "${SITE_DIR}/shared/.env.api" .env || error_exit "Failed to link .env"
+
     # Generate Prisma client first
     log_info "Generating Prisma client..."
     (cd apps/api && npx prisma generate) || error_exit "Prisma generation failed"
@@ -160,7 +164,7 @@ restart_services() {
     # Wait for API to be healthy
     log_info "Waiting for API health check..."
     for i in {1..30}; do
-        if curl -sf http://localhost:3102/healthz > /dev/null 2>&1; then
+        if curl -sf http://localhost:4000/healthz > /dev/null 2>&1; then
             log_info "API is healthy"
             break
         fi
@@ -203,7 +207,7 @@ health_check() {
     log_step "Running health checks..."
 
     # Check API
-    if curl -sf http://localhost:3102/healthz > /dev/null 2>&1; then
+    if curl -sf http://localhost:4000/healthz > /dev/null 2>&1; then
         log_info "✓ API health check passed"
     else
         log_warn "✗ API health check failed"
