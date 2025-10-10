@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import type { Ticket } from "@data";
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from "@ui";
@@ -12,7 +12,6 @@ import { formatIsoDate } from "@/lib/utils";
 
 export default function TicketDetailPage() {
   const params = useParams();
-  const router = useRouter();
   const provider = useDataProvider();
   const user = useAppSelector((state) => state.auth.user);
   const [ticket, setTicket] = useState<Ticket | null>(null);

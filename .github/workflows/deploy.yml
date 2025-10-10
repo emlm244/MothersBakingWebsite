@@ -1,0 +1,71 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to VPS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install pnpm
+        run: npm install -g pnpm@9
+
+      - name: Install dependencies
+        run: cd chien-treats && pnpm install --frozen-lockfile
+
+      - name: Build frontend
+        run: cd chien-treats && CI=true pnpm build
+
+      - name: Deploy to VPS
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
+          RELEASE_DIR="/srv/sites/chienstreats/releases/$(date +%Y%m%d_%H%M%S)"
+
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST "mkdir -p $RELEASE_DIR"
+          rsync -avz -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            --exclude='.next' \
+            ./chien-treats/ $VPS_USER@$VPS_HOST:$RELEASE_DIR/
+
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST << 'EOF'
+            cd $RELEASE_DIR
+            pnpm install --frozen-lockfile --prod
+            pnpm build
+            ln -sfn $RELEASE_DIR /srv/sites/chienstreats/current
+            sudo systemctl restart chienstreats-frontend
+          EOF
+
+      - name: Health check
+        run: |
+          sleep 10
+          curl -f http://${{ secrets.VPS_HOST }} || exit 1
+
+      - name: Cleanup old releases
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST \
+            "cd /srv/sites/chienstreats/releases && ls -t | tail -n +6 | xargs -r rm -rf"
