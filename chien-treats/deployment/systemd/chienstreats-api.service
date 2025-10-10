@@ -10,7 +10,7 @@ Group=chienstreats
 WorkingDirectory=/srv/sites/chienstreats/current/apps/api
 Environment=NODE_ENV=production
 EnvironmentFile=/srv/sites/chienstreats/shared/.env
-ExecStart=/usr/bin/node dist/main.js
+ExecStart=/usr/bin/node dist/apps/api/src/main.js
 Restart=always
 RestartSec=10s
 StandardOutput=append:/srv/sites/chienstreats/shared/logs/api.log
