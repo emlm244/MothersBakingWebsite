@@ -64,7 +64,7 @@
         "date-fns": "^4.1.0",
         "dayjs": "^1.11.13",
         "dexie": "^4.2.0",
-        "fastify": "^4.28.1",
+        "fastify": "4.28.1",
         "fastify-raw-body": "^4.2.0",
         "framer-motion": "^12.23.22",
         "fs-extra": "^11.2.0",
