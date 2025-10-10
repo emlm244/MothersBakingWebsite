@@ -96,7 +96,7 @@ build_app() {
 
     # Generate Prisma client first
     log_info "Generating Prisma client..."
-    cd apps/api && npx prisma generate && cd ../.. || error_exit "Prisma generation failed"
+    (cd apps/api && npx prisma generate) || error_exit "Prisma generation failed"
 
     # Build Next.js frontend
     log_info "Building Next.js frontend..."
