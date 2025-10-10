@@ -82,7 +82,8 @@ install_dependencies() {
 
     cd "${RELEASE_DIR}/chien-treats"
 
-    pnpm install --frozen-lockfile --prod || error_exit "Failed to install dependencies"
+    # Install all dependencies (including dev) for build process
+    pnpm install --frozen-lockfile || error_exit "Failed to install dependencies"
 
     log_info "Dependencies installed"
 }
