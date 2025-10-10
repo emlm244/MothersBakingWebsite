@@ -4,7 +4,8 @@
                             "noEmit":  false,
                             "incremental":  false,
                             "sourceMap":  false,
-                            "declaration":  true
+                            "declaration":  true,
+                            "skipLibCheck":  true
                         },
     "include":  [
                     "src/**/*"
