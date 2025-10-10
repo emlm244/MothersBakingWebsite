@@ -7,10 +7,10 @@ Wants=postgresql.service redis-server.service
 Type=simple
 User=chienstreats
 Group=chienstreats
-WorkingDirectory=/srv/sites/chienstreats/current/apps/api
+WorkingDirectory=/srv/sites/chienstreats/current
 Environment=NODE_ENV=production
-EnvironmentFile=/srv/sites/chienstreats/shared/.env
-ExecStart=/usr/bin/node dist/apps/api/src/main.js
+EnvironmentFile=/srv/sites/chienstreats/shared/.env.api
+ExecStart=/usr/bin/node apps/api/dist/apps/api/src/main.js
 Restart=always
 RestartSec=10s
 StandardOutput=append:/srv/sites/chienstreats/shared/logs/api.log
