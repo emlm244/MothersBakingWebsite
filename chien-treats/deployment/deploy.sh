@@ -94,6 +94,10 @@ build_app() {
 
     cd "${RELEASE_DIR}/chien-treats"
 
+    # Generate Prisma client first
+    log_info "Generating Prisma client..."
+    cd apps/api && npx prisma generate && cd ../.. || error_exit "Prisma generation failed"
+
     # Build Next.js frontend
     log_info "Building Next.js frontend..."
     pnpm build || error_exit "Frontend build failed"
