@@ -1,24 +1,24 @@
 import type { MetadataRoute } from "next";
+import { caseStudies } from "@/content/site";
 
-const BASE_URL = "https://chienstreats.com";
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "https://coralhosts.com";
 
-const ROUTES = [
+const STATIC_ROUTES = [
   "",
-  "/shop",
-  "/custom-orders",
-  "/reviews",
-  "/gallery",
+  "/services",
+  "/projects",
   "/about",
-  "/visit",
   "/contact",
-  "/faq",
-  "/support/new",
-  "/cart",
+  "/media-kit",
+  "/legal/privacy",
+  "/legal/terms",
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
-  return ROUTES.map((path) => ({
+  const projectRoutes = caseStudies.map((project) => `/projects/${project.slug}`);
+
+  return [...STATIC_ROUTES, ...projectRoutes].map((path) => ({
     url: `${BASE_URL}${path}`,
     lastModified,
     changeFrequency: "weekly" as const,

@@ -1,21 +1,37 @@
 :root {
-  --color-bg:       #F2E6D8;
-  --color-pink:     #F7A8C5;
-  --color-pink-600: #E4749F;
-  --color-brown:    #6B4A3A;
-  --color-cream:    #FFF7F3;
-  --color-white:    #FFFFFF;
-  --color-black:    #121212;
-  --color-red:      #DA2E47;
-  --color-yellow:   #F6C94C;
-  --color-silver:   #C0C5CB;
+  /* Brand palette */
+  --color-background: #f4f5f7;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f0f4f7;
+  --color-coral-50: #ffe9e3;
+  --color-coral-100: #ffd6cc;
+  --color-coral-300: #ff9b84;
+  --color-coral-500: #f45d48;
+  --color-coral-600: #dd4934;
+  --color-coral-700: #c13423;
+  --color-teal-50: #e3f4f6;
+  --color-teal-100: #c2e6ec;
+  --color-teal-400: #44bcd0;
+  --color-teal-500: #1a9aaf;
+  --color-teal-600: #117f92;
+  --color-navy-900: #081931;
+  --color-slate-800: #1f2937;
+  --color-slate-600: #475569;
+  --color-slate-400: #94a3b8;
+  --color-sand-200: #f8e8d8;
+  --color-success: #15803d;
+  --color-warning: #b45309;
+  --color-error: #dc2626;
 
-  --radius-sm: 8px;
+  --shadow-xs: 0 1px 2px rgba(8, 25, 49, 0.08);
+  --shadow-sm: 0 8px 20px rgba(8, 25, 49, 0.08);
+  --shadow-lg: 0 18px 48px rgba(8, 25, 49, 0.12);
+
+  --radius-xs: 6px;
+  --radius-sm: 10px;
   --radius-md: 16px;
   --radius-lg: 24px;
-
-  --shadow-1: 0 2px 6px rgba(0, 0, 0, 0.08);
-  --shadow-2: 0 8px 24px rgba(0, 0, 0, 0.1);
+  --radius-xl: 32px;
 
   --space-1: 0.25rem;
   --space-2: 0.5rem;
@@ -23,7 +39,10 @@
   --space-4: 1rem;
   --space-5: 1.5rem;
   --space-6: 2rem;
+  --space-7: 2.5rem;
+  --space-8: 3rem;
 
-  --font-brand: "Nunito", "Baloo 2", system-ui, sans-serif;
-  --font-body: "Inter", system-ui, sans-serif;
+  --font-display: "Geist", "Poppins", system-ui, sans-serif;
+  --font-body: "Geist", "Inter", system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 }

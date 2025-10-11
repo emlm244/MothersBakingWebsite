@@ -1,0 +1,31 @@
+[Unit]
+Description=Coral Hosts Marketing Site (Next.js)
+After=network.target
+
+[Service]
+Type=simple
+User=coralhosts
+Group=coralhosts
+WorkingDirectory=/srv/sites/coralhosts/current
+Environment=NODE_ENV=production
+Environment=PORT=3101
+EnvironmentFile=/srv/sites/coralhosts/shared/.env
+ExecStart=/usr/bin/node .next/standalone/server.js
+Restart=always
+RestartSec=10s
+StandardOutput=append:/srv/sites/coralhosts/shared/logs/frontend.log
+StandardError=append:/srv/sites/coralhosts/shared/logs/frontend-error.log
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/sites/coralhosts/shared/logs
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictRealtime=true
+RestrictNamespaces=true
+
+[Install]
+WantedBy=multi-user.target

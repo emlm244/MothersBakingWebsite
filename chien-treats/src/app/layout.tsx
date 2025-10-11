@@ -1,129 +1,78 @@
 import type { Metadata } from "next";
-import { Nunito, Inter } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
-import { AppProviders } from "./providers";
+import { SiteShell } from "@/components/site-shell";
+import { company } from "@/content/site";
+import { siteConfig } from "@/lib/config";
+import { organizationSchema, projectSchemas, serviceSchemas, websiteSchema } from "@/lib/schema";
 
-const brand = Nunito({
-  subsets: ["latin"],
-  variable: "--font-brand",
+const geist = localFont({
+  src: "./fonts/GeistVF.woff",
+  variable: "--font-display",
+  display: "swap",
 });
 
-const body = Inter({
-  subsets: ["latin"],
-  variable: "--font-body",
+const geistMono = localFont({
+  src: "./fonts/GeistMonoVF.woff",
+  variable: "--font-mono",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://chienstreats.com"),
+  metadataBase: new URL(siteConfig.baseUrl),
   title: {
-    default: "Chien's Treats | Artisan Macarons in Seattle",
-    template: "%s | Chien's Treats",
+    default: `${company.name} | Managed web hosting for ambitious teams`,
+    template: `%s | ${company.name}`,
   },
-  description:
-    "Seattle's cozy macaron bakery on Capitol Hill. Hand-crafted French macarons with seasonal flavors, custom boxes, and local pickup. Order online today!",
-  keywords: ["macarons", "bakery", "Seattle bakery", "Capitol Hill", "French pastry", "custom desserts", "macarons Seattle"],
+  description: company.description,
+  keywords: [
+    "managed hosting",
+    "WordPress hosting",
+    "marketing site performance",
+    "web operations",
+    "Cloudflare partner",
+    "SRE for marketing teams",
+  ],
   openGraph: {
-    title: "Chien's Treats | Artisan Macarons in Seattle",
-    description:
-      "Hand-crafted French macarons with seasonal flavors. Custom boxes, local pickup on Capitol Hill. Browse our flavors and order online.",
-    type: "website",
+    title: company.name,
+    description: company.description,
+    url: siteConfig.baseUrl,
+    siteName: company.name,
     locale: "en_US",
-    siteName: "Chien's Treats",
+    type: "website",
     images: [
       {
-        url: "/og-image.svg",
-        width: 1200,
-        height: 630,
-        alt: "Chien's Treats - Artisan Macarons",
+        url: `${siteConfig.baseUrl}/brand/coral-hosts-logomark.svg`,
+        width: 512,
+        height: 512,
+        alt: `${company.name} social preview`,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Chien's Treats | Artisan Macarons in Seattle",
-    description: "Hand-crafted French macarons on Capitol Hill. Custom boxes & seasonal flavors.",
-    images: ["/og-image.svg"],
+    title: company.name,
+    description: company.description,
+    images: [`${siteConfig.baseUrl}/brand/coral-hosts-logomark.svg`],
   },
   alternates: {
-    canonical: "https://chienstreats.com",
-  },
-  robots: {
-    index: true,
-    follow: true,
+    canonical: siteConfig.baseUrl,
   },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  const localBusinessSchema = {
-    "@context": "https://schema.org",
-    "@type": "Bakery",
-    "name": "Chien's Treats",
-    "image": "https://chienstreats.com/og-image.svg",
-    "description": "Artisan macaron bakery specializing in custom boxes, seasonal flavors, and celebration desserts.",
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": "714 E Pine St",
-      "addressLocality": "Seattle",
-      "addressRegion": "WA",
-      "postalCode": "98122",
-      "addressCountry": "US"
-    },
-    "telephone": "+1-206-555-0184",
-    "email": "hello@chiens.treats",
-    "url": "https://chienstreats.com",
-    "openingHoursSpecification": [
-      {
-        "@type": "OpeningHoursSpecification",
-        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday"],
-        "opens": "10:00",
-        "closes": "18:00"
-      },
-      {
-        "@type": "OpeningHoursSpecification",
-        "dayOfWeek": "Friday",
-        "opens": "10:00",
-        "closes": "19:00"
-      },
-      {
-        "@type": "OpeningHoursSpecification",
-        "dayOfWeek": "Saturday",
-        "opens": "09:00",
-        "closes": "17:00"
-      }
-    ],
-    "priceRange": "$$",
-    "servesCuisine": ["French", "Desserts"],
-    "acceptsReservations": false,
-    "paymentAccepted": "Cash, Credit Card"
-  };
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const schema = [organizationSchema(), websiteSchema(), ...serviceSchemas(), ...projectSchemas()];
 
   return (
-    <html lang="en" className={`${brand.variable} ${body.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${geist.variable} ${geistMono.variable}`} suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/favicon.svg" />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
-        />
+        <link rel="icon" href="/brand/coral-hosts-favicon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/brand/coral-hosts-favicon.svg" />
+        <link rel="preconnect" href="https://fonts.bunny.net" />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
       </head>
-      <body className="min-h-screen bg-bg text-brown">
-        <a
-          href="#main"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-pink text-white px-4 py-2 rounded-md shadow-soft z-50"
-        >
-          Skip to main content
-        </a>
-        <AppProviders>
-          <div id="portal-root" />
-          <main id="main" className="min-h-screen">
-            {children}
-          </main>
-        </AppProviders>
+      <body className="bg-background text-slate-800 antialiased">
+        <SiteShell>{children}</SiteShell>
       </body>
     </html>
   );

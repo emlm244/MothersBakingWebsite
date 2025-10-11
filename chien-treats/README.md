@@ -1,72 +1,70 @@
-# Chien's Treats
+# Coral Hosts
 
-Chien's Treats is a cozy, cartoon-inspired bakery experience focused on artisan macarons. The repo contains both the public storefront and the role-gated admin panel, powered entirely on the client with a swappable data provider (IndexedDB by default) so it works offline or without a backend.
+Coral Hosts is a managed hosting and web reliability partner for marketing, product, and compliance teams. The site is a statically generated Next.js 15 application with structured content, accessibility-first UI, and lead generation flows wired into a spam-hardened contact intake.
 
-## Quick start
+## Getting started
 
-```
+```bash
 pnpm install
 pnpm dev
 ```
 
-Open http://localhost:3000 for the storefront and http://localhost:3000/admin for the admin panel.
+Open http://localhost:3000 to view the marketing site. The project uses the Next.js App Router; edits hot reload instantly.
 
-### Scripts
+## Scripts
 
-| Command | Description |
-| --- | --- |
-| pnpm dev | Run Next.js with hot reload |
-| pnpm build | Production build |
-| pnpm start | Start the production build |
-| pnpm lint | ESLint (includes a11y & Tailwind plugins) |
-| pnpm typecheck | TypeScript type checking |
-| pnpm test | Vitest unit suite |
-| pnpm test:watch | Vitest watch mode |
-| pnpm test:e2e | Playwright smoke flow |
-| pnpm seed | Export demo seed data to public/demo-seed.json |
+| command          | description                                      |
+| ---------------- | ------------------------------------------------ |
+| `pnpm dev`       | Start the development server                     |
+| `pnpm build`     | Production build with static generation          |
+| `pnpm start`     | Serve the production build                       |
+| `pnpm lint`      | ESLint with JSX a11y and Tailwind rules          |
+| `pnpm typecheck` | TypeScript project check                         |
+| `pnpm test`      | Vitest unit tests                                |
+| `pnpm test:e2e`  | Playwright smoke and accessibility regression    |
+| `pnpm check`     | Run lint, typecheck, unit, and e2e suites        |
 
-## Tech stack
+## Architecture
 
-- Next.js App Router + React 19
-- Redux Toolkit for global state
-- React Hook Form + Zod for forms
-- Tailwind CSS + design tokens (styles/tokens.css)
-- Radix UI primitives and custom design system components (packages/ui)
-- Dexie-backed IndexedDB data provider (packages/data/indexed-db-provider)
-- Vitest/RTL, Playwright, axe-core integration in CI
+- **Framework**: Next.js 15 (App Router) with React 19 RC
+- **Styling**: Tailwind CSS with design tokens declared in `styles/tokens.css`
+- **Content**: Typed data modules in `src/content` feeding page layouts
+- **Forms**: React Hook Form + Zod validation, anti-spam honeypot + time-trap, optional SMTP delivery
+- **SEO**: JSON-LD schema (Organization, Service, Project, Breadcrumb), sitemap, and tuned metadata helpers
+- **Testing**: Vitest for units, Testing Library helpers, Playwright e2e with axe assertions ready for expansion
 
-## Design system & tokens
+## Contact form delivery
 
-Tokens follow the PFP_Colors palette described in the brief and live in styles/tokens.css. Tailwind maps the CSS variables into theme extensions so design updates happen centrally.
+`/api/contact` expects SMTP credentials via environment variables:
 
-## Data model
+```
+SMTP_HOST=
+SMTP_PORT=
+SMTP_SECURE=false
+SMTP_USER=
+SMTP_PASS=
+CONTACT_INBOX=hello@coralhosts.com
+CONTACT_FROM=no-reply@coralhosts.com
+```
 
-All entities (Product, Order, Review, Ticket, Coupon, etc.) are defined in packages/data/models.ts. The UI only talks to the DataProvider interface, keeping future REST/GraphQL integrations isolated.
+If SMTP credentials are absent the submission is logged to the server console, ensuring local development works without external services.
 
-## Integration points
+## Accessibility & performance guardrails
 
-See docs/INTEGRATIONS.md for the REST and Stripe contracts. The client currently uses:
+- Accessible navigation, skip links, focus management, and high-contrast theming
+- Automated timing checks on contact form submissions to discourage spam bots
+- Responsive hero and section layouts optimized for Core Web Vitals (no blocking scripts, minimal bundle)
+- `pnpm test:e2e` confirms critical journeys and catches regressions early
 
-- startCheckout to simulate Stripe demo payments
-- DataProvider implementations for persistence (IndexedDB + in-memory fallback)
+## Deployment
 
-## Testing & quality
+1. `pnpm build` generates a static bundle suitable for any Node or edge host.
+2. Serve with `pnpm start` (Next.js standalone output) behind your reverse proxy/CDN.
+3. Provide the SMTP env vars above for contact intake notifications.
+4. Update `NEXT_PUBLIC_SITE_URL` to the canonical host before deployment so metadata + sitemap emit correct URLs.
 
-- Unit tests: pnpm test
-- Playwright smoke tests: pnpm test:e2e
-- Accessibility: lint rules + axe assertions in Playwright (extendable)
-- CI (.github/workflows/ci.yml) runs lint, typecheck, unit, and e2e suites on pushes / PRs
-
-## Deployment notes
-
-1. Build with pnpm build
-2. Serve with pnpm start
-3. Seed demo data via Admin ? Dev Tools or pnpm seed (writes JSON for local import)
-
-## Contributing
-
-See CONTRIBUTING.md for workflow, branching, and Conventional Commits guidance. CODEOWNERS require one approval on main.
+For VPS or container-based deploys see `RUNBOOK.md` for operational guidance, health checks, and rollback steps.
 
 ## License
 
-MIT – see LICENSE.
+MIT – see [LICENSE](./LICENSE).

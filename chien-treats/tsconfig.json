@@ -25,31 +25,7 @@
                             "paths":  {
                                           "@/*":  [
                                                       "./src/*"
-                                                  ],
-                                          "@data":  [
-                                                        "./packages/data/index.ts"
-                                                    ],
-                                          "@data/*":  [
-                                                          "./packages/data/*"
-                                                      ],
-                                          "@ui/*":  [
-                                                        "./packages/ui/*"
-                                                    ],
-                                          "@config/*":  [
-                                                            "./packages/config/*"
-                                                        ],
-                                          "@emails/*":  [
-                                                            "./packages/emails/*"
-                                                        ],
-                                          "@ui":  [
-                                                      "./packages/ui/index.ts"
-                                                  ],
-                                          "@config":  [
-                                                          "./packages/config/index.ts"
-                                                      ],
-                                          "@emails":  [
-                                                          "./packages/emails/index.ts"
-                                                      ]
+                                                  ]
                                       },
                             "types":  [
                                           "vitest/globals"
@@ -62,7 +38,6 @@
                     ".next/types/**/*.ts"
                 ],
     "exclude":  [
-                    "node_modules",
-                    "apps/api/**/*"
+                    "node_modules"
                 ]
 }
